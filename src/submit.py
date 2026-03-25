@@ -5,4 +5,4 @@ def submit(X, y, test, model):
     submission = model.predict(test)
     submission = pd.DataFrame(submission, columns=['Label'])
     submission.insert(0, 'ImageId', range(1, len(submission)+1))
-    submission.to_csv('../submissions/submission_01.csv', index = False)
+    submission.to_csv('submission.csv', index = False)
