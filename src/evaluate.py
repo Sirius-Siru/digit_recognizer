@@ -33,7 +33,7 @@ def showWrongCase(model, X_test, y_test):
     for i, idx in enumerate(top20):
         plt.subplot(4, 5, i+1)
         
-        img = X_test.iloc[idx].values.reshape(28, 28) 
+        img = X_test[idx][:784].reshape(28, 28) 
         plt.imshow(img, cmap='gray')
         
         plt.title(f"True: {y_test.iloc[idx]}\nPred: {y_pred[idx]}\nConf: {confidence[idx]:.2f}")

@@ -5,6 +5,6 @@ def normalize(train, test):
     train[cols] = train[cols].astype(float)
     test[test.columns] = test[test.columns].astype(float)
     
-    train.iloc[:, 1:] /= 255
+    train.iloc[:, :] /= 255
     test /= 255
     return train, test
