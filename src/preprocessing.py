@@ -3,6 +3,7 @@ from skimage import exposure
 from skimage.morphology import skeletonize
 import cv2
 import numpy as np
+from joblib import Parallel, delayed
 
 def extract_hog(img_28x28):
     features, hog_image = hog(
@@ -48,13 +49,18 @@ def aug_skltn_e_hog(img, is_train):
     orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten()))
     aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten())) if is_train else None
 
-    return (orgin_combined, aug_combined) if is_train else orgin_combined
+    return np.vstack((orgin_combined, aug_combined)) if is_train else orgin_combined
 
-def combine(results):
-    origin, aug = zip(*results)
 
-    origin = np.array(origin)
-    aug = np.array(aug)
+def process_batch(batch_images, is_train):
+    results = []
+    for img in batch_images:
+        results.append(aug_skltn_e_hog(img, is_train))
+    return np.vstack(results)
 
-    X = np.concatenate((origin, aug), axis=0)
-    return X
+def data_process(img):
+    batch_size = 5000
+    batches = [img[i:i + batch_size] for i in range(0, len(img), batch_size)]
+    X_list = Parallel(n_jobs=-1)(delayed(process_batch)(b, True) for b in batches)
+
+    return np.vstack(X_list)
