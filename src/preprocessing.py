@@ -58,9 +58,9 @@ def process_batch(batch_images, is_train):
         results.append(aug_skltn_e_hog(img, is_train))
     return np.vstack(results)
 
-def data_process(img):
+def data_process(img, is_train):
     batch_size = 5000
     batches = [img[i:i + batch_size] for i in range(0, len(img), batch_size)]
-    X_list = Parallel(n_jobs=-1)(delayed(process_batch)(b, True) for b in batches)
+    X_list = Parallel(n_jobs=-1)(delayed(process_batch)(b, is_train) for b in batches)
 
     return np.vstack(X_list)
