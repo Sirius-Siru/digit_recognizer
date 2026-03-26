@@ -31,3 +31,23 @@ def skltn(img):
     img_bin = (img > 0.5).astype(np.uint8)
     skeleton = skeletonize(img_bin)
     return skeleton
+
+def aug_skltn_e_hog(img, is_train):
+    # Augment
+    aug = augment(img) if is_train else None 
+
+    # Skeletonize
+    sklt = skltn(img)
+    aug_sklt = skltn(aug) if is_train else None
+
+    # Hog
+    hog_origin = extract_hog(img)
+    hog_sklt = extract_hog(sklt)
+    hog_aug_origin = extract_hog(aug) if is_train else None
+    hog_aug_sklt = extract_hog(aug_sklt) if is_train else None
+
+    # Combine
+    orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(), hog_sklt))
+    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten(), hog_aug_sklt)) if is_train else None
+
+    return np.vstack(orgin_combined, aug_combined) if is_train else orgin_combined
