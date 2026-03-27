@@ -4,6 +4,7 @@ from skimage.morphology import skeletonize
 import cv2
 import numpy as np
 from joblib import Parallel, delayed
+import gc
 
 def extract_hog(img_28x28):
     features, hog_image = hog(
@@ -53,12 +54,25 @@ def getDensityandDepth(img):
     x_ratio = np.sum(left_half) / (np.sum(right_half) + 1e-6)
 
     # Bounding box to first non-zero pixel
+    fixed_left = np.full(28, -1.0)
+    fixed_right = np.full(28, -1.0)
+    fixed_top = np.full(28, -1.0)
+    fixed_bottom = np.full(28, -1.0)
+
     left_p   = np.argmax(mask, axis=1)
     right_p  = np.argmax(mask[:, ::-1], axis=1)
     top_p    = np.argmax(mask, axis=0)
     bottom_p = np.argmax(mask[::-1, :], axis=0)
 
-    return y_ratio, x_ratio, left_p, right_p, top_p, bottom_p
+    fixed_left[:len(left_p)] = left_p
+    fixed_right[:len(right_p)] = right_p
+    fixed_top[:len(top_p)] = top_p
+    fixed_bottom[:len(bottom_p)] = bottom_p
+
+    del left_p, right_p, top_p, bottom_p
+    gc.collect()
+
+    return y_ratio, x_ratio, fixed_left, fixed_right, fixed_top, fixed_bottom
 
 
 def aug_skltn_e_hog(img, is_train):
