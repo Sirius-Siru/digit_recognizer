@@ -17,7 +17,7 @@ def extract_hog(img_28x28):
     return features
 
 def augment(img):
-    angle = np.random.uniform(-10, 10)
+    angle = np.random.uniform(-5, 5)
     scale = np.random.uniform(0.9, 1.1)
     tx = np.random.uniform(-2, 2)  # shift ngang (pixel)
     ty = np.random.uniform(-2, 2)  # shift dọc

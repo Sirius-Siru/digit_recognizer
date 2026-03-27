@@ -36,7 +36,7 @@ def showWrongCase(model, X_test, y_test):
         img = X_test[idx][:784].reshape(28, 28) 
         plt.imshow(img, cmap='gray')
         
-        plt.title(f"True: {y_test.iloc[idx]}\nPred: {y_pred[idx]}\nConf: {confidence[idx]:.2f}")
+        plt.title(f"Idx: {idx}\nTrue: {y_test.iloc[idx]}\nPred: {y_pred[idx]}\nConf: {confidence[idx]:.2f}")
         plt.axis('off')
     
     plt.tight_layout()
