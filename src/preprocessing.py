@@ -71,7 +71,7 @@ def aug_skltn_e_hog(img, is_train):
 
     # Combine
     orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(), y_ratio_org, x_ratio_org))
-    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, y_ratio_aug, x_ratio_aug)) if is_train else None
+    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten(), y_ratio_aug, x_ratio_aug)) if is_train else None
 
     return np.vstack((orgin_combined, aug_combined)) if is_train else orgin_combined
 
