@@ -29,7 +29,7 @@ def augment(img):
     return cv2.warpAffine(img, M, (28, 28), borderValue=0)
 
 def skltn(img):
-    img_bin = (img > 0.7).astype(np.uint8)
+    img_bin = (img > 0.5).astype(np.uint8)
     skeleton = skeletonize(img_bin)
     return skeleton
 
@@ -41,33 +41,37 @@ def getDensityRatio(img):
 
     cropped = img[ymin:ymax+1, xmin:xmax+1]
 
-    height = cropped.shape[0]
-    upper_half = cropped[:height//2, :]
-    lower_half = cropped[height//2:, :]
+    h, w = cropped.shape
+    upper_half = cropped[:h//2, :]
+    lower_half = cropped[h//2:, :]
+
+    left_half = cropped[:, :w//2]
+    right_half = cropped[:, w//2:]
     
-    density_ratio = np.sum(upper_half) / (np.sum(lower_half) + 1e-6)
-    return density_ratio
+    y_ratio = np.sum(upper_half) / (np.sum(lower_half) + 1e-6)
+    x_ratio = np.sum(left_half) / (np.sum(right_half) + 1e-6)
+    return y_ratio, x_ratio
 
 
 def aug_skltn_e_hog(img, is_train):
     # Augment
     aug = augment(img) if is_train else None 
 
-    # Calculate half upper and half lower ratio
-    origin_DRatio = getDensityRatio(img)
-    aug_DRatio = getDensityRatio(aug) if is_train else None
-
     # Skeletonize
     sklt = skltn(img)
     aug_sklt = skltn(aug) if is_train else None
+
+    # Calculate half upper and half lower ratio
+    y_ratio_org, x_ratio_org = getDensityRatio(sklt)
+    y_ratio_aug, x_ratio_aug = getDensityRatio(aug_sklt) if is_train else None
 
     # Hog
     hog_origin = extract_hog(img)
     hog_aug_origin = extract_hog(aug) if is_train else None
 
     # Combine
-    orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(), origin_DRatio))
-    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten(), aug_DRatio)) if is_train else None
+    orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(), y_ratio_org, x_ratio_org))
+    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, y_ratio_aug, x_ratio_aug)) if is_train else None
 
     return np.vstack((orgin_combined, aug_combined)) if is_train else orgin_combined
 
