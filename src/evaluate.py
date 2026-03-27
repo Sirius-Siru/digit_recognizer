@@ -20,10 +20,10 @@ def evaluate(y_test, y_pred):
     plt.title("Confusion Matrix")
     plt.show()
     
-def showWrongCase(model, X_test, y_test):
+def showWrongCase(model, X_test, y_test, proba = None):
     
-    probs = model.predict_proba(X_test)
-    y_pred = np.argmax(probs, axis=1)
+    probs = model.predict_proba(X_test) if proba is None else proba
+    y_pred = np.argmax(probs, axis=1) 
     confidence = np.max(probs, axis=1)
     wrong_idx = np.where(y_pred != y_test)[0]
     wrong_conf = confidence[wrong_idx]
