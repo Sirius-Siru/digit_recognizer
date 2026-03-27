@@ -63,7 +63,7 @@ def aug_skltn_e_hog(img, is_train):
 
     # Calculate half upper and half lower ratio
     y_ratio_org, x_ratio_org = getDensityRatio(sklt)
-    y_ratio_aug, x_ratio_aug = getDensityRatio(aug_sklt) if is_train else None
+    y_ratio_aug, x_ratio_aug = getDensityRatio(aug_sklt) if is_train else (None, None)
 
     # Hog
     hog_origin = extract_hog(img)
