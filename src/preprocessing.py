@@ -33,7 +33,7 @@ def skltn(img):
     skeleton = skeletonize(img_bin)
     return skeleton
 
-def getDensityRatio(img){
+def getDensityRatio(img):
     rows = np.any(img > 0, axis=1)
     cols = np.any(img > 0, axis=0)
     ymin, ymax = np.where(rows)[0][[0, -1]]
@@ -47,7 +47,7 @@ def getDensityRatio(img){
     
     density_ratio = np.sum(upper_half) / (np.sum(lower_half) + 1e-6)
     return density_ratio
-}
+
 
 def aug_skltn_e_hog(img, is_train):
     # Augment
