@@ -33,7 +33,7 @@ def skltn(img):
     skeleton = skeletonize(img_bin)
     return skeleton
 
-def getDensityRatio(img):
+def getDensityandDepth(img):
     rows = np.any(img > 0, axis=1)
     cols = np.any(img > 0, axis=0)
     ymin, ymax = np.where(rows)[0][[0, -1]]
@@ -41,6 +41,7 @@ def getDensityRatio(img):
 
     cropped = img[ymin:ymax+1, xmin:xmax+1]
 
+    mask = cropped > 0
     h, w = cropped.shape
     upper_half = cropped[:h//2, :]
     lower_half = cropped[h//2:, :]
@@ -50,7 +51,14 @@ def getDensityRatio(img):
     
     y_ratio = np.sum(upper_half) / (np.sum(lower_half) + 1e-6)
     x_ratio = np.sum(left_half) / (np.sum(right_half) + 1e-6)
-    return y_ratio, x_ratio
+
+    # Bounding box to first non-zero pixel
+    left_p   = np.argmax(mask, axis=1)
+    right_p  = np.argmax(mask[:, ::-1], axis=1)
+    top_p    = np.argmax(mask, axis=0)
+    bottom_p = np.argmax(mask[::-1, :], axis=0)
+
+    return y_ratio, x_ratio, left_p, right_p, top_p, bottom_p
 
 
 def aug_skltn_e_hog(img, is_train):
@@ -62,16 +70,20 @@ def aug_skltn_e_hog(img, is_train):
     aug_sklt = skltn(aug) if is_train else None
 
     # Calculate half upper and half lower ratio
-    y_ratio_org, x_ratio_org = getDensityRatio(sklt)
-    y_ratio_aug, x_ratio_aug = getDensityRatio(aug_sklt) if is_train else (None, None)
+    y_ratio_org, x_ratio_org, left_p_org, right_p_org, top_p_org, bottom_p_org = getDensityandDepth(sklt)
+    y_ratio_aug, x_ratio_aug, left_p_aug, right_p_aug, top_p_aug, bottom_p_aug = getDensityandDepth(aug_sklt) if is_train else (None, None, None, None, None, None)
 
     # Hog
     hog_origin = extract_hog(img)
     hog_aug_origin = extract_hog(aug) if is_train else None
 
     # Combine
-    orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(), y_ratio_org, x_ratio_org))
-    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten(), y_ratio_aug, x_ratio_aug)) if is_train else None
+    orgin_combined = np.hstack((img.flatten(), hog_origin, sklt.flatten(),
+                                y_ratio_org, x_ratio_org, left_p_org, right_p_org,
+                                top_p_org, bottom_p_org))
+    aug_combined = np.hstack((aug.flatten(), hog_aug_origin, aug_sklt.flatten(),
+                            y_ratio_aug, x_ratio_aug, left_p_aug, right_p_aug, 
+                            top_p_aug, bottom_p_aug)) if is_train else None
 
     return np.vstack((orgin_combined, aug_combined)) if is_train else orgin_combined
 
