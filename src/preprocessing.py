@@ -142,4 +142,4 @@ def cnn_preprocess(img):
     img = center_image(img)
 
     img = np.expand_dims(img, axis = -1)
-    return img
+    return np.array(img)
