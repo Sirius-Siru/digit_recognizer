@@ -141,4 +141,5 @@ def cnn_preprocess(img):
     img = cv2.resize(img, (28, 28))
     img = center_image(img)
 
+    img = np.expand_dims(img, axis = -1)
     return img
