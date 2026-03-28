@@ -29,9 +29,9 @@ def showWrongCase(model, X_test, y_test, proba = None):
     wrong_conf = confidence[wrong_idx]
     top_wrong_idx = wrong_idx[np.argsort(-wrong_conf)]
     top50 = top_wrong_idx[:50]
-    
+    plt.figure(figsize=(20, 10))
     for i, idx in enumerate(top50):
-        
+        plt.subplot(5, 10, i + 1)
         img = X_test[idx][:784].reshape(28, 28) 
         plt.imshow(img, cmap='gray')
         
