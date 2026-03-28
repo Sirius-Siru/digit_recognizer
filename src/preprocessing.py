@@ -33,7 +33,7 @@ def augment(img):
 def skltn(img):
     img_bin = (img > 0.5).astype(np.uint8)
     skeleton = skeletonize(img_bin)
-    return skeleton
+    return skeleton.astype(np.uint8)
 
 def getDensityandDepth(img):
     rows = np.any(img > 0, axis=1)
