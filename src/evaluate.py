@@ -31,7 +31,6 @@ def showWrongCase(model, X_test, y_test, proba = None):
     top50 = top_wrong_idx[:50]
     
     for i, idx in enumerate(top50):
-        plt.subplot(10, 5, i+1)
         
         img = X_test[idx][:784].reshape(28, 28) 
         plt.imshow(img, cmap='gray')

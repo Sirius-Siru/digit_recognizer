@@ -137,7 +137,6 @@ def center_image(img):
     return centered
 
 def cnn_preprocess(img):
-    img = skltn(img)
     img = crop_bbox(img)
     img = cv2.resize(img, (28, 28))
     img = center_image(img)
