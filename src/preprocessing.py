@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from joblib import Parallel, delayed
 import gc
+from scipy import ndimage
 
 def extract_hog(img_28x28):
     features, hog_image = hog(
@@ -114,3 +115,30 @@ def data_process(img, is_train):
     X_list = Parallel(n_jobs=-1)(delayed(process_batch)(b, is_train) for b in batches)
 
     return np.vstack(X_list)
+
+def crop_bbox(img):
+    rows = np.any(img > 0, axis=1)
+    cols = np.any(img > 0, axis=0)
+    ymin, ymax = np.where(rows)[0][[0, -1]]
+    xmin, xmax = np.where(cols)[0][[0, -1]]
+
+    cropped = img[ymin:ymax+1, xmin:xmax+1]
+    return cropped
+
+def center_image(img):
+    cy, cx = ndimage.center_of_mass(img)
+
+    h, w = img.shape
+    shift_y = h//2 - cy
+    shift_x = w//2 - cx
+
+    centered = ndimage.shift(img, shift=(shift_y, shift_x))
+
+    return centered
+
+def cnn_preprocess(img):
+    img = crop_bbox(img)
+    img = cv2.resize(img, (28, 28))
+    img = center_image(img)
+
+    return img
